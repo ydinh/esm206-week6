@@ -1,0 +1,66 @@
+---
+title: "code along"
+author: "Yvonne Dinh"
+date: "11/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(palmerpenguins)
+library(ggpubr)
+library(broom)
+```
+
+```{r}
+set.seed(1414)
+gp_1 <- sample.int(20, size = 15, replace = TRUE)
+
+set.seed(1424)
+gp_2 <- sample.int(30, size = 15, replace = TRUE)
+
+hist(gp_1)
+hist(gp_2)
+
+my_mwu=wilcox.test(gp_1, gp_2)
+```
+```{r}
+#palmer penguins exploration
+ggplot(penguins, aes(x=flipper_length_mm, y=body_mass_g))+
+  geom_point()
+
+#linear model
+penguin_lm=lm(body_mass_g ~ flipper_length_mm, data=penguins)
+summary(penguin_lm)
+
+#make the lm output prettier to read
+penguin_lm_tidy <- broom::tidy(penguin_lm)
+
+#get the intercept
+penguin_lm_tidy$estimate[1]
+#get the coefficient
+penguin_lm_tidy$estimate[2]
+
+#metrics at a glance
+penguin_lm_out=broom::glance(penguin_lm)
+penguin_lm_out
+
+#explore model assumptions
+plot(penguin_lm)
+
+#visualize the model
+ggplot(data = penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm",
+              color = "red",
+              size = 0.5,
+              fill = "gray10",
+              alpha = 0.5) +
+  theme_light() +
+  ggpubr::stat_regline_equation(label.x = 180, label.y = 5700)
+
+#find Pearson's r correlation
+cor.test(penguins$flipper_length_mm, penguins$body_mass_g)
+```
+
